@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_06_164920) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_10_125010) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,4 +21,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_06_164920) do
     t.string "password"
     t.datetime "updated_at", null: false
   end
+
+  create_table "words", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "meaning"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "word"
+    t.index ["user_id"], name: "index_words_on_user_id"
+  end
+
+  add_foreign_key "words", "users"
 end
