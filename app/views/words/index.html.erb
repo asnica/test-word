@@ -1,0 +1,15 @@
+<h1>単語一覧</h1>
+
+<% @words.each do |word| %>
+  <div>
+    <strong><%= word.word %></strong>
+    <span><%= word.meaning %></span>
+
+    <%= link_to "編集", "/words/#{word.id}/edit" %>
+    <%= button_to "削除", "/words/#{word.id}", method: :delete %>
+  </div>
+<% end %>
+
+<p>
+  <%= link_to "新しい単語を登録", "/words/new" %>
+</p>

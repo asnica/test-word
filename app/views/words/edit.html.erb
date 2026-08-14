@@ -1,0 +1,28 @@
+<h1>単語を編集</h1>
+
+<% if @word.errors.any? %>
+  <div>
+    <h2>更新に失敗しました</h2>
+    <ul>
+      <% @word.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with url: "/words/#{@word.id}", method: :patch do |form| %>
+  <div>
+    <%= form.label :word, "単語" %>
+    <%= form.text_field :word, value: @word.word %>
+  </div>
+
+  <div>
+    <%= form.label :meaning, "意味" %>
+    <%= form.text_field :meaning, value: @word.meaning %>
+  </div>
+
+  <div>
+    <%= form.submit "更新" %>
+  </div>
+<% end %>
