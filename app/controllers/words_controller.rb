@@ -1,6 +1,13 @@
 class WordsController < ApplicationController
+
+before_action :require_login
+
   def index
-    @words = User.first.words
+    @words = current_user.words
+  end
+
+  def show
+    @word = Word.find(params[:id])
   end
 
   def new
@@ -8,9 +15,8 @@ class WordsController < ApplicationController
   end
 
   def create
-    user = User.first
 
-    @word = user.words.new(
+    @word = current_user.words.new(
       word: params[:word],
       meaning: params[:meaning]
     )
@@ -26,23 +32,26 @@ class WordsController < ApplicationController
     @word = Word.find(params[:id])
   end
 
-  def update
-    @word = Word.find(params[:id])
+def update
+  @word = current_user.words.find(params[:id])
 
-    if @word.update(
-      word: params[:word],
-      meaning: params[:meaning]
-    )
-      redirect_to words_path
-    else
-      render :edit, status: :unprocessable_entity
-    end
+  if @word.update(word_params)
+    redirect_to word_path(@word)
+  else
+    render :edit, status: :unprocessable_entity
   end
+end
 
   def destroy
-    word = Word.find(params[:id])
+    word = current_user.words.find(params[:id])
     word.destroy
 
     redirect_to words_path
+  end
+
+  private
+
+  def word_params
+    params.require(:word).permit(:word, :meaning)
   end
 end
