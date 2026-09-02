@@ -50,8 +50,10 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
 
     assert_difference("Word.count", 1) do
       post words_path, params: {
-        word: "banana",
+        word: {
+          word: "banana",
         meaning: "バナナ"
+        }
       }
     end
 

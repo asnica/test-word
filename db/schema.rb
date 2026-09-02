@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_17_065442) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_180733) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "synonyms", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.bigint "word_id", null: false
+    t.index ["word_id"], name: "index_synonyms_on_word_id"
+  end
 
   create_table "tags", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -40,6 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_065442) do
 
   create_table "words", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "deleted_at"
     t.string "meaning"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -47,6 +56,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_17_065442) do
     t.index ["user_id"], name: "index_words_on_user_id"
   end
 
+  add_foreign_key "synonyms", "words"
   add_foreign_key "word_tags", "tags"
   add_foreign_key "word_tags", "words"
   add_foreign_key "words", "users"

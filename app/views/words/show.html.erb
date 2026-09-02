@@ -10,5 +10,30 @@
   <%= @word.meaning %>
 </p>
 
+<p>
+  <strong>タグ:</strong>
+
+<% if @word.tags.any? %>
+<% @word.tags.each do |tag| %>
+<%= tag.name %>
+<% end %>
+<% else %>
+タグなし
+<% end %>
+
+</p>
+
 <%= link_to "編集", edit_word_path(@word) %>
 <%= link_to "一覧に戻る", words_path %>
+
+<p>
+  <strong>類義語:</strong>
+
+  <% if @word.synonyms.any? %>
+    <% @word.synonyms.each do |synonym| %>
+      <%= synonym.name %>
+    <% end %>
+  <% else %>
+    類義語なし
+  <% end %>
+</p>

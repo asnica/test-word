@@ -1,6 +1,7 @@
 <h1>単語を編集</h1>
 
 <% if @word.errors.any? %>
+
   <div>
     <h2>更新に失敗しました</h2>
     <ul>
@@ -12,6 +13,7 @@
 <% end %>
 
 <%= form_with model: @word do |form| %>
+
   <div>
     <%= form.label :word, "単語" %>
     <%= form.text_field :word %>
@@ -20,6 +22,29 @@
   <div>
     <%= form.label :meaning, "意味" %>
     <%= form.text_field :meaning %>
+  </div>
+
+  <div>
+    <p>タグ</p>
+
+```
+<% @tags.each do |tag| %>
+  <div>
+    <%= check_box_tag "tag_ids[]",
+                      tag.id,
+                      @word.tag_ids.include?(tag.id),
+                      id: "tag_#{tag.id}" %>
+
+    <%= label_tag "tag_#{tag.id}", tag.name %>
+  </div>
+<% end %>
+```
+<div>
+  <%= form.label :synonyms, "類義語" %>
+  <%= text_field_tag :synonyms,
+                     @word.synonyms.pluck(:name).join(", ") %>
+</div>
+
   </div>
 
   <div>
