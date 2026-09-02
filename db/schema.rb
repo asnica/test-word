@@ -10,20 +10,45 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_125010) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_180733) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "synonyms", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.bigint "word_id", null: false
+    t.index ["word_id"], name: "index_synonyms_on_word_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email"
     t.string "name"
     t.string "password"
+    t.string "password_digest"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "word_tags", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "word_id", null: false
+    t.index ["tag_id"], name: "index_word_tags_on_tag_id"
+    t.index ["word_id"], name: "index_word_tags_on_word_id"
   end
 
   create_table "words", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "deleted_at"
     t.string "meaning"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
@@ -31,5 +56,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_125010) do
     t.index ["user_id"], name: "index_words_on_user_id"
   end
 
+  add_foreign_key "synonyms", "words"
+  add_foreign_key "word_tags", "tags"
+  add_foreign_key "word_tags", "words"
   add_foreign_key "words", "users"
 end
