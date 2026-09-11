@@ -1,13 +1,13 @@
 Rails.application.routes.draw do
-  get "words", to: "words#index"
-  get "words/new", to: "words#new"
-  post "words", to: "words#create"
-  get "words/:id/edit", to: "words#edit"
-  patch "words/:id", to: "words#update"
-  delete "words/:id", to: "words#destroy"
+
+resources :words, only: [:index, :show, :new, :create, :edit, :update, :destroy]
 
   root "users#new"
 
   post "users", to: "users#create"
   get "users/new", to: "users#new"
+
+  get "login", to: "sessions#new"
+  post "login", to: "sessions#create"
+  delete "logout", to: "sessions#destroy"
 end

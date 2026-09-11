@@ -1,12 +1,36 @@
 <h1>単語一覧</h1>
 
+<%= form_with url: words_path, method: :get do %>
+  <%= text_field_tag :keyword, params[:keyword], placeholder: "単語を検索" %>
+  <%= submit_tag "検索" %>
+<% end %>
+
 <% @words.each do |word| %>
   <div>
-    <strong><%= word.word %></strong>
+    <strong>
+  <%= link_to word.word, word_path(word) %>
+  </strong>
     <span><%= word.meaning %></span>
 
+    <% if word.tags.any? %> 
+      <span> 
+        タグ: <% word.tags.each do |tag| %> 
+          <%= tag.name %> 
+        <% end %> 
+      </span> 
+    <% end %>
+
+    <% if word.synonyms.any? %>
+  <span>
+    類義語:
+    <% word.synonyms.each do |synonym| %>
+      <%= synonym.name %>
+    <% end %>
+  </span>
+<% end %>
+
     <%= link_to "編集", "/words/#{word.id}/edit" %>
-    <%= button_to "削除", "/words/#{word.id}", method: :delete %>
+    <%= button_to "削除", "/words/#{word.id}", method: :delete, form: { data: { turbo: false } } %>
   </div>
 <% end %>
 
