@@ -6,22 +6,23 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
       email: user.email,
       password: "password"
     }
+    assert_redirected_to words_path
   end
 
-  test "should get index" do
-    user = User.create!(
-      name: "Test User",
-      email: "index@example.com",
-      password: "password",
-      password_confirmation: "password"
-    )
+test "should get index" do
+  user = User.create!(
+    name: "Test User",
+    email: "index@example.com",
+    password: "password",
+    password_confirmation: "password"
+  )
 
-    login_as(user)
+  login_as(user)
 
-    get words_path
+  get words_path
 
-    assert_response :success
-  end
+  assert_response :success
+end
 
   test "should get new" do
     user = User.create!(

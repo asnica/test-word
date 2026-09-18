@@ -1,0 +1,11 @@
+<div class="synonym-field">
+  <%= synonym_form.text_field :name %>
+
+  <%= synonym_form.hidden_field :_destroy %>
+
+  <button type="button"
+          class="remove-synonym"
+          data-action="click->synonyms#remove">
+    削除
+  </button>
+</div>

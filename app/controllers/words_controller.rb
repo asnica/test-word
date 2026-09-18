@@ -1,55 +1,62 @@
 class WordsController < ApplicationController
+  rescue_from ActiveRecord::RecordNotFound, with: :word_not_found
+
   before_action :require_login
   before_action :set_word, only: [:show, :edit, :update, :destroy]
+  before_action :set_tags, only: [:new, :create, :edit, :update]
 
- def index
-  @words = current_user.words
+  def index
+    @words = current_user.words.includes(:tags, :synonyms)
 
-  if params[:keyword].present?
-    @words = @words.where("word LIKE ? OR meaning LIKE ?", "%#{params[:keyword]}%", "%#{params[:keyword]}%")
+    if params[:keyword].present?
+      keyword = ActiveRecord::Base.sanitize_sql_like(params[:keyword])
+
+      @words = @words
+        .left_joins(:tags)
+        .where(
+          "words.word LIKE :keyword
+           OR words.meaning LIKE :keyword
+           OR tags.name LIKE :keyword",
+          keyword: "%#{keyword}%"
+        )
+        .distinct
+    end
   end
-end
 
   def show
   end
 
   def new
     @word = Word.new
-    @tags = Tag.all
+    @word.synonyms.build
   end
 
   def create
-  @word = current_user.words.new(word_params)
+    @word = current_user.words.new(word_params)
 
-  if @word.save
-    @word.tag_ids = params[:tag_ids]
-    redirect_to words_path
-  else
-    @tags = Tag.all
-    render :new, status: :unprocessable_entity
+    if @word.save
+      @word.tag_ids = params[:tag_ids]
+
+      redirect_to words_path
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
-end
 
   def edit
-    @tags = Tag.all
   end
 
- def update
-  if @word.update(word_params)
-    @word.tag_ids = params[:tag_ids] || []
+  def update
+    if @word.update(word_params)
+      if params.key?(:tag_ids)
+        @word.tag_ids = params[:tag_ids]
+      end
 
-    @word.synonyms.destroy_all
-
-    params[:synonyms].to_s.split(",").map(&:strip).reject(&:blank?).uniq.each do |name|
-      @word.synonyms.create(name: name)
+      redirect_to word_path(@word)
+    else
+      render :edit, status: :unprocessable_entity
     end
-
-    redirect_to word_path(@word)
-  else
-    @tags = Tag.all
-    render :edit, status: :unprocessable_entity
   end
-end
 
   def destroy
     @word.update(deleted_at: Time.current)
@@ -62,7 +69,19 @@ end
     @word = current_user.words.find(params[:id])
   end
 
+  def set_tags
+    @tags = current_user.tags
+  end
+
+  def word_not_found
+    render "words/not_found", status: :not_found
+  end
+
   def word_params
-    params.require(:word).permit(:word, :meaning)
+    params.require(:word).permit(
+      :word,
+      :meaning,
+      synonyms_attributes: [:id, :name, :_destroy]
+    )
   end
 end

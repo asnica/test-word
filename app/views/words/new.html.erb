@@ -24,17 +24,50 @@
     <%= form.text_field :meaning %>
   </div>
 
+ <div data-controller="synonyms">
+  <%= form.label :synonyms, "類義語" %>
+
+  <div id="synonyms">
+    <%= form.fields_for :synonyms do |synonym_form| %>
+      <%= render "synonym_fields", synonym_form: synonym_form %>
+    <% end %>
+  </div>
+
+  <button type="button" data-action="click->synonyms#add">
+    類義語を追加
+  </button>
+
+  <template id="synonym-template">
+    <div class="synonym-field">
+      <input
+        type="text"
+        name="word[synonyms_attributes][NEW_RECORD][name]"
+        id="word_synonyms_attributes_NEW_RECORD_name"
+      >
+
+      <inputs
+        type="hidden"
+        name="word[synonyms_attributes][NEW_RECORD][_destroy]"
+        id="word_synonyms_attributes_NEW_RECORD__destroy"
+        value="0"
+      >
+
+      <button type="button" data-action="click->synonyms#remove">
+        削除
+      </button>
+    </div>
+  </template>
+</div>
+
   <div>
     <p>タグ</p>
 
-```
 <% @tags.each do |tag| %>
   <div>
     <%= check_box_tag "tag_ids[]", tag.id, false, id: "tag_#{tag.id}" %>
     <%= label_tag "tag_#{tag.id}", tag.name %>
   </div>
 <% end %>
-```
 
   </div>
 

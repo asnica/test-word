@@ -1,4 +1,6 @@
 class Tag < ApplicationRecord
+  belongs_to :user
+  
   has_many :word_tags
   has_many :words, through: :word_tags
 
