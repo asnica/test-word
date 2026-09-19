@@ -35,7 +35,7 @@ class WordsController < ApplicationController
     @word = current_user.words.new(word_params)
 
     if @word.save
-      @word.tag_ids = params[:tag_ids]
+      @word.tag_ids = permitted_tag_ids if params.key?(:tag_ids)
 
       redirect_to words_path
     else
@@ -65,23 +65,27 @@ class WordsController < ApplicationController
 
   private
 
-  def set_word
-    @word = current_user.words.find(params[:id])
-  end
+def set_word
+  @word = current_user.words.find(params[:id])
+end
 
-  def set_tags
-    @tags = current_user.tags
-  end
+def set_tags
+  @tags = current_user.tags
+end
 
-  def word_not_found
-    render "words/not_found", status: :not_found
-  end
+def word_not_found
+  render "words/not_found", status: :not_found
+end
 
-  def word_params
-    params.require(:word).permit(
-      :word,
-      :meaning,
-      synonyms_attributes: [:id, :name, :_destroy]
-    )
-  end
+def permitted_tag_ids
+  current_user.tags.where(id: params[:tag_ids]).pluck(:id)
+end
+
+def word_params
+  params.require(:word).permit(
+    :word,
+    :meaning,
+    synonyms_attributes: [:id, :name, :_destroy]
+  )
+end
 end
