@@ -27,8 +27,9 @@
   <div>
     <p>タグ</p>
 
+    <%= hidden_field_tag "tag_ids[]", "" %>
 
-<% @tags.each do |tag| %>
+    <% @tags.each do |tag| %>
   <div>
     <%= check_box_tag "tag_ids[]",
                       tag.id,

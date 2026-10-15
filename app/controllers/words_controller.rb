@@ -48,9 +48,7 @@ class WordsController < ApplicationController
 
   def update
     if @word.update(word_params)
-      if params.key?(:tag_ids)
-        @word.tag_ids = params[:tag_ids]
-      end
+      @word.tag_ids = permitted_tag_ids if params.key?(:tag_ids)
 
       redirect_to word_path(@word)
     else
