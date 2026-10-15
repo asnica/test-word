@@ -1,0 +1,22 @@
+<h1>タグ編集</h1>
+
+<%= form_with model: @tag do |form| %>
+  <% if @tag.errors.any? %>
+    <ul>
+      <% @tag.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div>
+    <%= form.label :name, "タグ名" %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div>
+    <%= form.submit "更新" %>
+  </div>
+<% end %>
+
+<%= link_to "タグ一覧に戻る", tags_path %>

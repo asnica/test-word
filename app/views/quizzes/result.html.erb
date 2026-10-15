@@ -1,0 +1,36 @@
+<h1>採点結果</h1>
+
+<h2>
+  <%= @correct_count %> / 10 正解
+</h2>
+
+<% @quiz_questions.each do |question| %>
+  <div>
+    <h3>問題 <%= question.position %></h3>
+
+    <p>
+      <strong>単語:</strong>
+      <%= question.word.word %>
+    </p>
+
+    <p>
+      <strong>あなたの回答:</strong>
+      <%= question.selected_answer %>
+    </p>
+
+    <p>
+      <strong>正解:</strong>
+      <%= question.word.meaning %>
+    </p>
+
+    <% if question.selected_answer == question.word.meaning %>
+      <p>○ 正解</p>
+    <% else %>
+      <p>× 不正解</p>
+    <% end %>
+  </div>
+<% end %>
+
+<%= link_to "問題集に戻る", quizzes_path %>
+
+<%= link_to "ランキングはこちら", rankings_path %>

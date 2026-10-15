@@ -37,3 +37,13 @@
     類義語なし
   <% end %>
 </p>
+
+<p>
+  <strong>画像:</strong>
+</p>
+
+<% if @word.image.attached? %>
+  <%= image_tag @word.image, style: "max-width: 300px; height: auto;" %>
+<% else %>
+  <p>画像なし</p>
+<% end %>

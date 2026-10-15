@@ -1,0 +1,29 @@
+<h1>回答一覧</h1>
+
+<% @quiz_questions.each do |question| %>
+  <%= link_to quiz_path(@quiz, position: question.position) do %>
+    <div>
+      <strong><%= question.position %>.</strong>
+
+      <span>
+        <%= question.word.word %>
+      </span>
+
+      <span>
+        <% if question.selected_answer.present? %>
+          <%= question.selected_answer %>
+        <% else %>
+          未回答
+        <% end %>
+      </span>
+    </div>
+  <% end %>
+<% end %>
+
+<% unless @quiz.completed? %>
+  <%= link_to "中断する", quizzes_path %>
+
+  <%= button_to "採点する",
+      grade_quiz_path(@quiz),
+      method: :post %>
+<% end %>

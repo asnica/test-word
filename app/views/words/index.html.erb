@@ -5,6 +5,9 @@
   <%= submit_tag "検索" %>
 <% end %>
 
+<%= link_to "CSV出力",
+    words_path(format: :csv, keyword: params[:keyword]) %>
+
 <% @words.each do |word| %>
   <div>
     <strong>

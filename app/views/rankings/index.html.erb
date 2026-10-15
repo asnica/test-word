@@ -1,0 +1,47 @@
+<h1>Ranking</h1>
+
+<% if @my_ranking.present? %>
+  <div>
+    <h2>お疲れ様でした！</h2>
+
+    <p>
+      あなたの成績は、
+      <%= @my_ranking[:total_count] %>問中
+      <%= @my_ranking[:correct_count] %>問正解、
+      正解率<%= @my_ranking[:correct_rate] %>％で
+      <%= @my_ranking[:rank] %>位でした
+    </p>
+  </div>
+<% end %>
+
+<% if @rankings.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>順位</th>
+        <th>名前</th>
+        <th>正解率</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @rankings.each do |ranking| %>
+        <% if ranking[:user].id == current_user.id %>
+          <tr style="font-weight: bold; color: red;">
+        <% else %>
+          <tr>
+        <% end %>
+
+          <td><%= ranking[:rank] %>位</td>
+          <td><%= ranking[:user].name %></td>
+          <td><%= ranking[:correct_rate] %>％</td>
+
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>まだランキングデータがありません。</p>
+<% end %>
+
+<%= link_to "メインメニュー", words_path %>

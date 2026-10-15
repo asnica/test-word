@@ -24,6 +24,11 @@
     <%= form.text_field :meaning %>
   </div>
 
+  <div>
+  <%= form.label :image, "画像" %>
+  <%= form.file_field :image, accept: "image/*" %>
+</div>
+
  <div data-controller="synonyms">
   <%= form.label :synonyms, "類義語" %>
 
@@ -45,7 +50,7 @@
         id="word_synonyms_attributes_NEW_RECORD_name"
       >
 
-      <inputs
+      <input
         type="hidden"
         name="word[synonyms_attributes][NEW_RECORD][_destroy]"
         id="word_synonyms_attributes_NEW_RECORD__destroy"
