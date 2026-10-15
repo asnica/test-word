@@ -136,7 +136,7 @@ end
         word: "apple",
         meaning: "りんご"
       },
-      tag_ids: [tag.id]
+      tag_ids: [ tag.id ]
     }
 
     word = Word.order(:id).last
@@ -144,7 +144,7 @@ end
     assert_redirected_to words_path
     assert_not_includes word.tags, tag
   end
-  
+
   test "should destroy word" do
     user = User.create!(
       name: "Test User",

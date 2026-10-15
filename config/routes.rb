@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-
-resources :words, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+resources :words, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
 
   root "users#new"
 

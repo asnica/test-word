@@ -6,6 +6,6 @@ class Word < ApplicationRecord
   has_many :tags, through: :word_tags
   has_many :synonyms
   accepts_nested_attributes_for :synonyms, allow_destroy: true, reject_if: :all_blank
-  
+
   validates :word, uniqueness: { scope: :user_id, conditions: -> { where(deleted_at: nil) } }
 end

@@ -2,8 +2,8 @@ class WordsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :word_not_found
 
   before_action :require_login
-  before_action :set_word, only: [:show, :edit, :update, :destroy]
-  before_action :set_tags, only: [:new, :create, :edit, :update]
+  before_action :set_word, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_tags, only: [ :new, :create, :edit, :update ]
 
   def index
     @words = current_user.words.includes(:tags, :synonyms)
@@ -83,7 +83,7 @@ def word_params
   params.require(:word).permit(
     :word,
     :meaning,
-    synonyms_attributes: [:id, :name, :_destroy]
+    synonyms_attributes: [ :id, :name, :_destroy ]
   )
 end
 end
