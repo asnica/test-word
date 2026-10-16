@@ -7,7 +7,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create user" do
-    assert_difference('User.count', 1) do
+    assert_difference("User.count", 1) do
       post users_url, params: {
       user: {
           name: "ControllerTest User",
@@ -18,6 +18,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to root_path
+    assert_redirected_to words_path
   end
 end

@@ -6,22 +6,23 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
       email: user.email,
       password: "password"
     }
+    assert_redirected_to words_path
   end
 
-  test "should get index" do
-    user = User.create!(
-      name: "Test User",
-      email: "index@example.com",
-      password: "password",
-      password_confirmation: "password"
-    )
+test "should get index" do
+  user = User.create!(
+    name: "Test User",
+    email: "index@example.com",
+    password: "password",
+    password_confirmation: "password"
+  )
 
-    login_as(user)
+  login_as(user)
 
-    get words_path
+  get words_path
 
-    assert_response :success
-  end
+  assert_response :success
+end
 
   test "should get new" do
     user = User.create!(
@@ -106,6 +107,42 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to word_path(word)
     assert_equal "ブドウ", word.reload.meaning
+  end
+
+    test "should not assign another user's tag to word" do
+    user = User.create!(
+      name: "User A",
+      email: "tag-owner@example.com",
+      password: "password",
+      password_confirmation: "password"
+    )
+
+    other_user = User.create!(
+      name: "User B",
+      email: "other-tag-owner@example.com",
+      password: "password",
+      password_confirmation: "password"
+    )
+
+    tag = Tag.create!(
+      name: "other-user-tag",
+      user: other_user
+    )
+
+    login_as(user)
+
+    post words_path, params: {
+      word: {
+        word: "apple",
+        meaning: "りんご"
+      },
+      tag_ids: [ tag.id ]
+    }
+
+    word = Word.order(:id).last
+
+    assert_redirected_to words_path
+    assert_not_includes word.tags, tag
   end
 
   test "should destroy word" do

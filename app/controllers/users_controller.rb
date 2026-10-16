@@ -6,9 +6,11 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      redirect_to root_path, notice: "User created successfully."
+      reset_session
+      session[:user_id] = @user.id
+      redirect_to words_path, notice: "新しいユーザーが作成されました。"
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
