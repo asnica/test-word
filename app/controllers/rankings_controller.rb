@@ -35,7 +35,7 @@ class RankingsController < ApplicationController
     end
 
     @rankings.sort_by! do |ranking|
-      [-ranking[:correct_rate], -ranking[:correct_count]]
+      [ -ranking[:correct_rate], -ranking[:correct_count] ]
     end
 
     @rankings.each_with_index do |ranking, index|

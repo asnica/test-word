@@ -10,7 +10,7 @@ class UsersController < ApplicationController
       session[:user_id] = @user.id
 
       UserMailer.registration_complete(@user).deliver_later
-      
+
       redirect_to words_path, notice: "新しいユーザーが作成されました。"
     else
       render :new, status: :unprocessable_entity

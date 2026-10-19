@@ -2,7 +2,7 @@ class QuizzesController < ApplicationController
   before_action :require_login
 
   def index
-  @page = [params.fetch(:page, 1).to_i, 1].max
+  @page = [ params.fetch(:page, 1).to_i, 1 ].max
   @per_page = 4
 
   quizzes = current_user.quizzes
@@ -41,21 +41,20 @@ def show
   @quiz = current_user.quizzes.find(params[:id])
   if params[:position].present?
   position = params[:position]
-else
+  else
   unanswered = @quiz.quiz_questions
                     .where(selected_answer: nil)
                     .order(:position)
                     .first
 
   position = unanswered ? unanswered.position : 1
-end
+  end
 
 @quiz_question = @quiz.quiz_questions.find_by!(
   position: position
 )
 
 prepare_choices
-
 end
 
 def answers
@@ -139,7 +138,6 @@ def prepare_choices
                               .limit(2)
                               .pluck(:meaning)
 
-  @choices = (wrong_answers + [correct_answer]).shuffle
+  @choices = (wrong_answers + [ correct_answer ]).shuffle
 end
-
 end

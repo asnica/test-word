@@ -2,8 +2,8 @@ class WordsController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :word_not_found
 
   before_action :require_login
-  before_action :set_word, only: [:show, :edit, :update, :destroy]
-  before_action :set_tags, only: [:new, :create, :edit, :update]
+  before_action :set_word, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_tags, only: [ :new, :create, :edit, :update ]
 
   def index
     @words = current_user.words.includes(:tags, :synonyms)
@@ -93,7 +93,7 @@ class WordsController < ApplicationController
       :word,
       :meaning,
       :image,
-      synonyms_attributes: [:id, :name, :_destroy]
+      synonyms_attributes: [ :id, :name, :_destroy ]
     )
   end
 
@@ -101,10 +101,10 @@ class WordsController < ApplicationController
     require "csv"
 
     CSV.generate(headers: true) do |csv|
-      csv << ["単語", "意味"]
+      csv << [ "単語", "意味" ]
 
       words.each do |word|
-        csv << [word.word, word.meaning]
+        csv << [ word.word, word.meaning ]
       end
     end
   end

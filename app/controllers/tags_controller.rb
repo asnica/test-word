@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   before_action :require_login
-  before_action :set_tag, only: [:edit, :update, :destroy]
+  before_action :set_tag, only: [ :edit, :update, :destroy ]
 
   def index
     @tags = current_user.tags
