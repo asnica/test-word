@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_12_234419) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_21_175527) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,6 +43,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_12_234419) do
   end
 
   create_table "quiz_questions", force: :cascade do |t|
+    t.string "correct_answer"
     t.datetime "created_at", null: false
     t.integer "position"
     t.bigint "quiz_id", null: false

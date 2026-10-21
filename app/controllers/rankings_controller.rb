@@ -16,7 +16,7 @@ class RankingsController < ApplicationController
       total_count = questions.size
 
       correct_count = questions.count do |question|
-        question.selected_answer == question.word.meaning
+        question.selected_answer == question.correct_answer
       end
 
       correct_rate =

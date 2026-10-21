@@ -25,12 +25,19 @@ class QuizzesController < ApplicationController
     return
   end
 
+  if current_user.words.distinct.count(:meaning) < 3
+    redirect_to quizzes_path,
+              alert: "問題集を始めるには異なる意味を3種類以上登録してください。"
+    return
+  end
+
   quiz = current_user.quizzes.create!
 
   words.each_with_index do |word, index|
     quiz.quiz_questions.create!(
       word: word,
-      position: index + 1
+      position: index + 1,
+      correct_answer: word.meaning
     )
   end
 
@@ -39,6 +46,7 @@ end
 
 def show
   @quiz = current_user.quizzes.find(params[:id])
+  return redirect_to result_quiz_path(@quiz) if @quiz.completed?
   if params[:position].present?
   position = params[:position]
   else
@@ -64,14 +72,14 @@ end
 
 def answer
   @quiz = current_user.quizzes.find(params[:id])
-
+  return redirect_to result_quiz_path(@quiz) if @quiz.completed?
   @quiz_question = @quiz.quiz_questions.find_by!(
     position: params[:position]
   )
 
   @quiz_question.update!(
     selected_answer: params[:answer]
-  )
+  ) if params[:answer].present?
 
   if @quiz_question.position == 10
     redirect_to answers_quiz_path(@quiz)
@@ -99,7 +107,7 @@ def result
   @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
 
   @correct_count = @quiz_questions.count do |question|
-    question.selected_answer == question.word.meaning
+    question.selected_answer == question.correct_answer
   end
 end
 
@@ -111,7 +119,8 @@ def retry
   old_quiz.quiz_questions.order(:position).each do |question|
     new_quiz.quiz_questions.create!(
       word: question.word,
-      position: question.position
+      position: question.position,
+      correct_answer: question.word.meaning
     )
   end
 
@@ -120,6 +129,7 @@ end
 
 def grade
   @quiz = current_user.quizzes.find(params[:id])
+  return redirect_to result_quiz_path(@quiz) if @quiz.completed?
 
   @quiz.update!(completed: true)
 
@@ -129,15 +139,23 @@ end
 private
 
 def prepare_choices
-  correct_answer = @quiz_question.word.meaning
+  correct_answer = @quiz_question.correct_answer
+  selected_answer = @quiz_question.selected_answer
 
   wrong_answers = current_user.words
                               .where.not(id: @quiz_question.word_id)
                               .where.not(meaning: correct_answer)
-                              .order("RANDOM()")
-                              .limit(2)
                               .pluck(:meaning)
+                              .uniq
 
-  @choices = (wrong_answers + [ correct_answer ]).shuffle
+  if selected_answer.present? && selected_answer != correct_answer
+    wrong_answers.delete(selected_answer)
+    wrong_answers = wrong_answers.sample(1)
+    wrong_answers << selected_answer
+  else
+    wrong_answers = wrong_answers.sample(2)
+  end
+
+  @choices = (wrong_answers + [ correct_answer ]).uniq.shuffle
 end
 end

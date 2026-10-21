@@ -20,10 +20,10 @@
 
     <p>
       <strong>正解:</strong>
-      <%= question.word.meaning %>
+      <%= question.correct_answer %>
     </p>
 
-    <% if question.selected_answer == question.word.meaning %>
+    <% if question.selected_answer == question.correct_answer %>
       <p>○ 正解</p>
     <% else %>
       <p>× 不正解</p>

@@ -2,8 +2,12 @@
 
 one:
   user: one
-  completed: false
+  completed: true
 
 two:
   user: two
+  completed: false
+
+in_progress:
+  user: one
   completed: false
