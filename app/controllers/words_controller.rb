@@ -21,6 +21,16 @@ class WordsController < ApplicationController
         )
         .distinct
     end
+
+    respond_to do |format|
+      format.html
+
+      format.csv do
+        send_data generate_csv(@words),
+                  filename: "words-#{Date.current}.csv",
+                  type: "text/csv; charset=utf-8"
+      end
+    end
   end
 
   def show
@@ -36,7 +46,6 @@ class WordsController < ApplicationController
 
     if @word.save
       @word.tag_ids = permitted_tag_ids if params.key?(:tag_ids)
-
       redirect_to words_path
     else
       render :new, status: :unprocessable_entity
@@ -63,27 +72,40 @@ class WordsController < ApplicationController
 
   private
 
-def set_word
-  @word = current_user.words.find(params[:id])
-end
+  def set_word
+    @word = current_user.words.find(params[:id])
+  end
 
-def set_tags
-  @tags = current_user.tags
-end
+  def set_tags
+    @tags = current_user.tags
+  end
 
-def word_not_found
-  render "words/not_found", status: :not_found
-end
+  def word_not_found
+    render "words/not_found", status: :not_found
+  end
 
-def permitted_tag_ids
-  current_user.tags.where(id: params[:tag_ids]).pluck(:id)
-end
+  def permitted_tag_ids
+    current_user.tags.where(id: params[:tag_ids]).pluck(:id)
+  end
 
-def word_params
-  params.require(:word).permit(
-    :word,
-    :meaning,
-    synonyms_attributes: [ :id, :name, :_destroy ]
-  )
-end
+  def word_params
+    params.require(:word).permit(
+      :word,
+      :meaning,
+      :image,
+      synonyms_attributes: [ :id, :name, :_destroy ]
+    )
+  end
+
+  def generate_csv(words)
+    require "csv"
+
+    CSV.generate(headers: true) do |csv|
+      csv << [ "単語", "意味" ]
+
+      words.each do |word|
+        csv << [ word.word, word.meaning ]
+      end
+    end
+  end
 end

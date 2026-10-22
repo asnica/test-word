@@ -1,0 +1,48 @@
+<p>
+  問題 <%= @quiz_question.position %> / 10
+</p>
+
+<h2>
+  <%= @quiz_question.word.word %>
+</h2>
+
+<% if @quiz_question.word.synonyms.any? %>
+  <div>
+    <strong>【類義語】</strong>
+    <ul>
+      <% @quiz_question.word.synonyms.each do |synonym| %>
+        <li><%= synonym.name %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<p>意味を選んでください。</p>
+
+<%= form_with url: answer_quiz_path(@quiz),
+              method: :patch,
+              data: { turbo_frame: "_top" } do %>
+  <%= hidden_field_tag :position, @quiz_question.position %>
+
+  <% @choices.each do |choice| %>
+    <div>
+      <label>
+        <%= radio_button_tag :answer,
+              choice,
+              @quiz_question.selected_answer == choice %>
+        <%= choice %>
+      </label>
+    </div>
+  <% end %>
+
+  <% if @quiz_question.position == 10 %>
+    <%= submit_tag "採点する" %>
+  <% else %>
+    <%= submit_tag "次へ" %>
+  <% end %>
+<% end %>
+
+<% if @quiz_question.position > 1 %>
+  <%= link_to "前へ",
+      quiz_path(@quiz, position: @quiz_question.position - 1) %>
+<% end %>

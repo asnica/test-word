@@ -1,0 +1,16 @@
+<h1>問題集</h1>
+
+<%= turbo_frame_tag "quiz_question",
+    style: "display: block; border: 3px solid orange; padding: 20px; margin: 20px 0;" do %>
+
+  <%= render "question" %>
+
+<% end %>
+
+<%= link_to "回答一覧",
+    answers_quiz_path(@quiz),
+    data: { turbo_frame: "_top" } %>
+
+<%= link_to "中断する",
+    quizzes_path,
+    data: { turbo_frame: "_top" } %>

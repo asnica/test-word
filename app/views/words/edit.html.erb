@@ -25,6 +25,11 @@
   </div>
 
   <div>
+  <%= form.label :image, "画像" %>
+  <%= form.file_field :image, accept: "image/*" %>
+</div>
+
+  <div>
     <p>タグ</p>
 
     <%= hidden_field_tag "tag_ids[]", "" %>

@@ -1,0 +1,25 @@
+<h1>タグ一覧</h1>
+
+<%= form_with url: tags_path, method: :get do |form| %>
+  <%= form.text_field :keyword,
+      value: params[:keyword],
+      placeholder: "タグ名を検索" %>
+
+  <%= form.submit "検索" %>
+<% end %>
+
+<%= link_to "タグを追加", new_tag_path %>
+
+<ul>
+  <% @tags.each do |tag| %>
+    <li>
+      <%= tag.name %>
+      <%= link_to "編集", edit_tag_path(tag) %>
+
+      <%= button_to "削除",
+          tag_path(tag),
+          method: :delete,
+          data: { turbo_confirm: "このタグを削除しますか？" } %>
+    </li>
+  <% end %>
+</ul>

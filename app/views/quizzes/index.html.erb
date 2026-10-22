@@ -1,0 +1,47 @@
+<h1>問題集</h1>
+
+<%= button_to "新しく単語帳を始める", quizzes_path, method: :post %>
+
+<% if @quizzes.any? %>
+  <h2>過去の問題集</h2>
+
+  <% @quizzes.each do |quiz| %>
+    <% correct_count = quiz.quiz_questions.count do |question| %>
+      <% question.selected_answer == question.correct_answer %>
+    <% end %>
+
+    <div>
+      <p><%= correct_count %>/10点</p>
+
+      <% if quiz.completed? %>
+        <%= button_to "もう一度やる",
+            retry_quiz_path(quiz),
+            method: :post %>
+
+        <%= link_to "回答を見る",
+            answers_quiz_path(quiz) %>
+      <% else %>
+        <%= link_to "続きから",
+            quiz_path(quiz) %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if @total_pages > 1 %>
+    <div>
+      <% 1.upto(@total_pages) do |page| %>
+        <% if page == @page %>
+          <strong><%= page %></strong>
+        <% else %>
+          <%= link_to page, quizzes_path(page: page) %>
+        <% end %>
+      <% end %>
+
+      <% if @page < @total_pages %>
+        <%= link_to "次へ", quizzes_path(page: @page + 1) %>
+      <% end %>
+    </div>
+  <% end %>
+<% else %>
+  <p>問題集はまだありません。</p>
+<% end %>

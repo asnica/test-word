@@ -1,0 +1,27 @@
+one:
+  quiz: one
+  word: one
+  selected_answer: old_answer
+  correct_answer: MyString
+  position: 1
+
+two:
+  quiz: two
+  word: two
+  selected_answer: MyString
+  correct_answer: MyString
+  position: 1
+
+in_progress:
+  quiz: in_progress
+  word: one
+  selected_answer: old_answer
+  correct_answer: MyString
+  position: 1
+
+in_progress_second:
+  quiz: in_progress
+  word: two
+  selected_answer:
+  correct_answer: MyString
+  position: 2

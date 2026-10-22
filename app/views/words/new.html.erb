@@ -24,6 +24,11 @@
     <%= form.text_field :meaning %>
   </div>
 
+  <div>
+  <%= form.label :image, "画像" %>
+  <%= form.file_field :image, accept: "image/*" %>
+</div>
+
  <div data-controller="synonyms">
   <%= form.label :synonyms, "類義語" %>
 
