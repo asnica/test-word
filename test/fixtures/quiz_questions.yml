@@ -18,3 +18,10 @@ in_progress:
   selected_answer: old_answer
   correct_answer: MyString
   position: 1
+
+in_progress_second:
+  quiz: in_progress
+  word: two
+  selected_answer:
+  correct_answer: MyString
+  position: 2
