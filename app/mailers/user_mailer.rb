@@ -4,7 +4,7 @@ class UserMailer < ApplicationMailer
 
     mail(
       to: @user.email,
-      subject: "ユーザー登録が完了しました"
+      subject: "単語帳の新規登録完了のお知らせ"
     )
   end
 end
