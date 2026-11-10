@@ -1,0 +1,13 @@
+ja:
+  activerecord:
+    attributes:
+      word:
+        word: "単語"
+        meaning: "意味"
+        image: "画像"
+      
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      taken: "はすでに存在します"
+      blank: "を入力してください"
