@@ -14,9 +14,9 @@ class WordsController < ApplicationController
       @words = @words
         .left_joins(:tags)
         .where(
-          "words.word LIKE :keyword
-           OR words.meaning LIKE :keyword
-           OR tags.name LIKE :keyword",
+          "words.word ILIKE :keyword
+           OR words.meaning ILIKE :keyword
+           OR tags.name ILIKE :keyword",
           keyword: "%#{keyword}%"
         )
         .distinct

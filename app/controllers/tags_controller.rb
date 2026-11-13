@@ -8,7 +8,7 @@ class TagsController < ApplicationController
 
     if params[:keyword].present?
       keyword = ActiveRecord::Base.sanitize_sql_like(params[:keyword])
-      @tags = @tags.where("name LIKE ?", "%#{keyword}%")
+      @tags = @tags.where("name ILIKE ?", "%#{keyword}%")
     end
   end
 
