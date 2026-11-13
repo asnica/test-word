@@ -2,160 +2,162 @@ class QuizzesController < ApplicationController
   before_action :require_login
 
   def index
-  @page = [ params.fetch(:page, 1).to_i, 1 ].max
-  @per_page = 4
+    @page = [ params.fetch(:page, 1).to_i, 1 ].max
+    @per_page = 4
 
-  quizzes = current_user.quizzes
-                        .includes(quiz_questions: :word)
-                        .order(created_at: :desc)
+    quizzes = current_user.quizzes
+                          .includes(quiz_questions: :word)
+                          .order(created_at: :desc)
 
-  @total_pages = (quizzes.count.to_f / @per_page).ceil
+    @total_pages = (quizzes.count.to_f / @per_page).ceil
 
-  @quizzes = quizzes
-               .offset((@page - 1) * @per_page)
-               .limit(@per_page)
+    @quizzes = quizzes
+                 .offset((@page - 1) * @per_page)
+                 .limit(@per_page)
   end
 
   def create
-  words = current_user.words.order("RANDOM()").limit(10)
+    words = current_user.words.order("RANDOM()").limit(10)
 
-  if words.size < 10
-    redirect_to quizzes_path,
-                alert: "問題集を始めるには単語を10個以上登録してください。"
-    return
+    if words.size < 10
+      redirect_to quizzes_path,
+                  alert: "問題集を始めるには単語を10個以上登録してください。"
+      return
+    end
+
+    if current_user.words.distinct.count(:meaning) < 3
+      redirect_to quizzes_path,
+                  alert: "問題集を始めるには異なる意味を3種類以上登録してください。"
+      return
+    end
+
+    quiz = current_user.quizzes.create!
+
+    words.each_with_index do |word, index|
+      quiz.quiz_questions.create!(
+        word: word,
+        position: index + 1,
+        correct_answer: word.meaning
+      )
+    end
+
+    redirect_to quiz_path(quiz)
   end
 
-  if current_user.words.distinct.count(:meaning) < 3
-    redirect_to quizzes_path,
-              alert: "問題集を始めるには異なる意味を3種類以上登録してください。"
-    return
-  end
+  def show
+    @quiz = current_user.quizzes.find(params[:id])
+    return redirect_to result_quiz_path(@quiz) if @quiz.completed?
 
-  quiz = current_user.quizzes.create!
+    if params[:position].present?
+      position = params[:position]
+    else
+      unanswered = @quiz.quiz_questions
+                        .where(selected_answer: nil)
+                        .order(:position)
+                        .first
 
-  words.each_with_index do |word, index|
-    quiz.quiz_questions.create!(
-      word: word,
-      position: index + 1,
-      correct_answer: word.meaning
+      position = unanswered ? unanswered.position : 1
+    end
+
+    @quiz_question = @quiz.quiz_questions.find_by!(
+      position: position
     )
+
+    prepare_choices
   end
 
-  redirect_to quiz_path(quiz)
-end
-
-def show
-  @quiz = current_user.quizzes.find(params[:id])
-  return redirect_to result_quiz_path(@quiz) if @quiz.completed?
-  if params[:position].present?
-  position = params[:position]
-  else
-  unanswered = @quiz.quiz_questions
-                    .where(selected_answer: nil)
-                    .order(:position)
-                    .first
-
-  position = unanswered ? unanswered.position : 1
+  def answers
+    @quiz = current_user.quizzes.find(params[:id])
+    @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
   end
 
-@quiz_question = @quiz.quiz_questions.find_by!(
-  position: position
-)
+  def answer
+    @quiz = current_user.quizzes.find(params[:id])
+    return redirect_to result_quiz_path(@quiz) if @quiz.completed?
 
-prepare_choices
-end
+    @quiz_question = @quiz.quiz_questions.find_by!(
+      position: params[:position]
+    )
 
-def answers
-  @quiz = current_user.quizzes.find(params[:id])
-  @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
-end
+    @quiz_question.update!(
+      selected_answer: params[:answer]
+    ) if params[:answer].present?
 
-def answer
-  @quiz = current_user.quizzes.find(params[:id])
-  return redirect_to result_quiz_path(@quiz) if @quiz.completed?
-  @quiz_question = @quiz.quiz_questions.find_by!(
-    position: params[:position]
-  )
+    if @quiz_question.position == 10
+      redirect_to answers_quiz_path(@quiz)
+      return
+    end
 
-  @quiz_question.update!(
-    selected_answer: params[:answer]
-  ) if params[:answer].present?
+    next_position = @quiz_question.position + 1
 
-  if @quiz_question.position == 10
-    redirect_to answers_quiz_path(@quiz)
-    return
-  end
+    @quiz_question = @quiz.quiz_questions.find_by!(
+      position: next_position
+    )
 
-  next_position = @quiz_question.position + 1
+    prepare_choices
 
-  @quiz_question = @quiz.quiz_questions.find_by!(
-    position: next_position
-  )
-
-  prepare_choices
-
-  respond_to do |format|
-    format.turbo_stream
-    format.html do
-      redirect_to quiz_path(@quiz, position: next_position)
+    respond_to do |format|
+      format.turbo_stream
+      format.html do
+        redirect_to quiz_path(@quiz, position: next_position)
+      end
     end
   end
-end
 
-def result
-  @quiz = current_user.quizzes.find(params[:id])
-  @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
+  def result
+    @quiz = current_user.quizzes.find(params[:id])
+    @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
 
-  @correct_count = @quiz_questions.count do |question|
-    question.selected_answer == question.correct_answer
-  end
-end
-
-def retry
-  old_quiz = current_user.quizzes.find(params[:id])
-
-  new_quiz = current_user.quizzes.create!
-
-  old_quiz.quiz_questions.order(:position).each do |question|
-    new_quiz.quiz_questions.create!(
-      word: question.word,
-      position: question.position,
-      correct_answer: question.word.meaning
-    )
+    @correct_count = @quiz_questions.count do |question|
+      question.selected_answer == question.correct_answer
+    end
   end
 
-  redirect_to quiz_path(new_quiz)
-end
+  def retry
+    old_quiz = current_user.quizzes.find(params[:id])
 
-def grade
-  @quiz = current_user.quizzes.find(params[:id])
-  return redirect_to result_quiz_path(@quiz) if @quiz.completed?
+    new_quiz = current_user.quizzes.create!
 
-  @quiz.update!(completed: true)
+    old_quiz.quiz_questions.order(:position).each do |question|
+      new_quiz.quiz_questions.create!(
+        word: question.word,
+        position: question.position,
+        correct_answer: question.word.meaning
+      )
+    end
 
-  redirect_to result_quiz_path(@quiz)
-end
-
-private
-
-def prepare_choices
-  correct_answer = @quiz_question.correct_answer
-  selected_answer = @quiz_question.selected_answer
-
-  wrong_answers = current_user.words
-                              .where.not(id: @quiz_question.word_id)
-                              .where.not(meaning: correct_answer)
-                              .pluck(:meaning)
-                              .uniq
-
-  if selected_answer.present? && selected_answer != correct_answer
-    wrong_answers.delete(selected_answer)
-    wrong_answers = wrong_answers.sample(1)
-    wrong_answers << selected_answer
-  else
-    wrong_answers = wrong_answers.sample(2)
+    redirect_to quiz_path(new_quiz)
   end
 
-  @choices = (wrong_answers + [ correct_answer ]).uniq.shuffle
-end
+  def grade
+    @quiz = current_user.quizzes.find(params[:id])
+    return redirect_to result_quiz_path(@quiz) if @quiz.completed?
+
+    @quiz.update!(completed: true)
+
+    redirect_to result_quiz_path(@quiz)
+  end
+
+  private
+
+  def prepare_choices
+    correct_answer = @quiz_question.correct_answer
+    selected_answer = @quiz_question.selected_answer
+
+    wrong_answers = current_user.words
+                                .where.not(id: @quiz_question.word_id)
+                                .where.not(meaning: correct_answer)
+                                .pluck(:meaning)
+                                .uniq
+
+    if selected_answer.present? && selected_answer != correct_answer
+      wrong_answers.delete(selected_answer)
+      wrong_answers = wrong_answers.sample(1)
+      wrong_answers << selected_answer
+    else
+      wrong_answers = wrong_answers.sample(2)
+    end
+
+    @choices = (wrong_answers + [ correct_answer ]).uniq.shuffle
+  end
 end
