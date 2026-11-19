@@ -1,5 +1,8 @@
 class QuizzesController < ApplicationController
+  QUESTION_COUNT = 10
+
   before_action :require_login
+  before_action :set_quiz, only: [ :show, :answers, :answer, :result, :grade ]
 
   def index
     @page = [ params.fetch(:page, 1).to_i, 1 ].max
@@ -17,9 +20,9 @@ class QuizzesController < ApplicationController
   end
 
   def create
-    words = current_user.words.order("RANDOM()").limit(10)
+    words = current_user.words.order("RANDOM()").limit(QUESTION_COUNT)
 
-    if words.size < 10
+    if words.size < QUESTION_COUNT
       redirect_to quizzes_path,
                   alert: "問題集を始めるには単語を10個以上登録してください。"
       return
@@ -45,7 +48,6 @@ class QuizzesController < ApplicationController
   end
 
   def show
-    @quiz = current_user.quizzes.find(params[:id])
     return redirect_to result_quiz_path(@quiz) if @quiz.completed?
 
     if params[:position].present?
@@ -67,12 +69,10 @@ class QuizzesController < ApplicationController
   end
 
   def answers
-    @quiz = current_user.quizzes.find(params[:id])
     @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
   end
 
   def answer
-    @quiz = current_user.quizzes.find(params[:id])
     return redirect_to result_quiz_path(@quiz) if @quiz.completed?
 
     @quiz_question = @quiz.quiz_questions.find_by!(
@@ -83,7 +83,7 @@ class QuizzesController < ApplicationController
       selected_answer: params[:answer]
     ) if params[:answer].present?
 
-    if @quiz_question.position == 10
+    if @quiz_question.position == QUESTION_COUNT
       redirect_to answers_quiz_path(@quiz)
       return
     end
@@ -105,7 +105,6 @@ class QuizzesController < ApplicationController
   end
 
   def result
-    @quiz = current_user.quizzes.find(params[:id])
     @quiz_questions = @quiz.quiz_questions.includes(:word).order(:position)
 
     @correct_count = @quiz_questions.count do |question|
@@ -130,7 +129,6 @@ class QuizzesController < ApplicationController
   end
 
   def grade
-    @quiz = current_user.quizzes.find(params[:id])
     return redirect_to result_quiz_path(@quiz) if @quiz.completed?
 
     @quiz.update!(completed: true)
@@ -139,6 +137,10 @@ class QuizzesController < ApplicationController
   end
 
   private
+
+  def set_quiz
+    @quiz = current_user.quizzes.find(params[:id])
+  end
 
   def prepare_choices
     correct_answer = @quiz_question.correct_answer

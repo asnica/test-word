@@ -1,16 +1,24 @@
+
 require "test_helper"
 
 class RankingsControllerTest < ActionDispatch::IntegrationTest
+  def login_as(user)
+    post login_path, params: {
+      email: user.email,
+      password: "password"
+    }
+
+    assert_redirected_to words_path
+  end
+
   test "should redirect to login when not logged in" do
     get rankings_url
 
     assert_redirected_to login_path
   end
+
   test "should rank users using only completed quizzes" do
-    post login_path, params: {
-      email: users(:one).email,
-      password: "password"
-    }
+    login_as(users(:one))
 
     get rankings_url
 
@@ -23,13 +31,11 @@ class RankingsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "tbody tr td", text: "Test User Two", count: 0
   end
-    test "should rank users by correct rate" do
+
+  test "should rank users by correct rate" do
     quizzes(:two).update!(completed: true)
 
-    post login_path, params: {
-      email: users(:one).email,
-      password: "password"
-    }
+    login_as(users(:one))
 
     get rankings_url
 
@@ -50,7 +56,7 @@ class RankingsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-    test "should rank users by correct count when correct rates are equal" do
+  test "should rank users by correct count when correct rates are equal" do
     quizzes(:two).update!(completed: true)
 
     quiz_questions(:one).update!(
@@ -64,10 +70,7 @@ class RankingsControllerTest < ActionDispatch::IntegrationTest
       correct_answer: "MyString"
     )
 
-    post login_path, params: {
-      email: users(:one).email,
-      password: "password"
-    }
+    login_as(users(:one))
 
     get rankings_url
 
