@@ -18,6 +18,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to words_path
+    assert_redirected_to main_menu_path
   end
 end

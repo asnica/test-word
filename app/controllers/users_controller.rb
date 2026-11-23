@@ -11,7 +11,7 @@ class UsersController < ApplicationController
 
       UserMailer.registration_complete(@user).deliver_later
 
-      redirect_to words_path, notice: "新しいユーザーが作成されました。"
+      redirect_to main_menu_path, notice: "新しいユーザーが作成されました。"
     else
       render :new, status: :unprocessable_entity
     end

@@ -6,7 +6,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
       email: user.email,
       password: "password"
     }
-    assert_redirected_to words_path
+    assert_redirected_to main_menu_path
   end
 
 test "should get index" do
