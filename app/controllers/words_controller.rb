@@ -11,14 +11,18 @@ class WordsController < ApplicationController
     if params[:keyword].present?
       keyword = ActiveRecord::Base.sanitize_sql_like(params[:keyword])
 
+      pattern = "%#{keyword}%"
+
+      words = Word.arel_table
+      tags = Tag.arel_table
+
+      condition = words[:word].matches(pattern, nil, false)
+        .or(words[:meaning].matches(pattern, nil, false))
+        .or(tags[:name].matches(pattern, nil, false))
+
       @words = @words
         .left_joins(:tags)
-        .where(
-          "words.word LIKE :keyword
-           OR words.meaning LIKE :keyword
-           OR tags.name LIKE :keyword",
-          keyword: "%#{keyword}%"
-        )
+        .where(condition)
         .distinct
     end
 
