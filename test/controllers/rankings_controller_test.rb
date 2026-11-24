@@ -8,7 +8,7 @@ class RankingsControllerTest < ActionDispatch::IntegrationTest
       password: "password"
     }
 
-    assert_redirected_to words_path
+    assert_redirected_to main_menu_path
   end
 
   test "should redirect to login when not logged in" do
